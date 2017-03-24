@@ -1,0 +1,68 @@
+<ion-header>
+
+    <ion-navbar color="primary">
+        <ion-title>{{status_label}}</ion-title>
+    </ion-navbar>
+
+</ion-header>
+
+<ion-content padding>
+    <ion-list>
+        <ion-item>
+            <ion-label stacked>Data</ion-label>
+            <ion-datetime [(ngModel)]="log.datetime" displayFormat="DD/MM/YYYY HH:mm" pickerFormat="DD-MM-YYYY HH:mm" ></ion-datetime>
+        </ion-item>
+        <ion-item>
+            <ion-label stacked>Unidade</ion-label>
+            <ion-select [(ngModel)]="log.unity">
+                <ion-option value="CTI Adulto">CTI Adulto</ion-option>
+                <ion-option value="CTI NeoNatal">CTI Neonatal</ion-option>
+                <ion-option value="Hemodiálise">Hemodiálise</ion-option>
+                <ion-option value="SR">SR</ion-option>
+                <ion-option value="Emergência">Emergência</ion-option>
+                <ion-option value="Centro Cirúrgico">Centro Cirúrgico</ion-option>
+            </ion-select>
+        </ion-item>
+        <ion-item>
+            <ion-label stacked>Profissional</ion-label>
+            <ion-select [(ngModel)]="log.position">
+                <ion-option value="Médico Assistente">Médico Assistente</ion-option>
+                <ion-option value="Médido Rotineiro">Médido Rotineiro</ion-option>
+                <ion-option value="Enfermeiro">Enfermeiro</ion-option>
+                <ion-option value="Técnico de Enfermagem">Técnico de Enfermagem</ion-option>
+                <ion-option value="Fisioterapeuta">Fisioterapeuta</ion-option>
+                <ion-option value="Outro Prossional">Outro Prossional</ion-option>
+            </ion-select>
+        </ion-item>
+
+        <ion-item>
+            <ion-label stacked>Momento</ion-label>
+            <ion-select [(ngModel)]="log.moment">
+                <ion-option value="Antes do Contato com Paciente">Antes do Contato com Paciente</ion-option>
+                <ion-option value="Antes do Procedimento Acéptico">Antes do Procedimento Acéptico</ion-option>
+                <ion-option value="Após as exposição de fuídos corporeos">Após as exposição de fuídos corporeos</ion-option>
+                <ion-option value="Após contato com o paciente">Após contato com o paciente</ion-option>
+                <ion-option value="Após áreas próximas ao paciente">Após áreas próximas ao paciente</ion-option>
+            </ion-select>
+        </ion-item>
+
+        <ion-item>
+            <ion-label>Higienizou as mãos</ion-label>
+            <ion-toggle checked="true" [(ngModel)]="log.did_it"></ion-toggle>
+        </ion-item>
+
+        <ion-item *ngIf="log.did_it">
+            <ion-label stacked>Insumo</ion-label>
+            <ion-select [(ngModel)]="log.input">
+                <ion-option value="Alcool Gel">Alcool Gel</ion-option>
+                <ion-option value="Água e Sabão">Água e Sabão</ion-option>
+            </ion-select>
+        </ion-item>
+        <ion-item>
+            <button ion-button icon-left item-right large (click)="updateLog()">
+                <ion-icon name='bug'></ion-icon>
+                Salvar
+            </button>
+        </ion-item>
+    </ion-list>
+</ion-content>

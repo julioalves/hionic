@@ -1,0 +1,30 @@
+<ion-header >
+    <ion-navbar color="primary">
+        <ion-title>Logs</ion-title>
+    </ion-navbar>
+</ion-header>
+<ion-content padding>
+    <ion-fab top right edge (click)="addLog()">
+        <button ion-fab color="danger" ><ion-icon name="add"></ion-icon></button>
+    </ion-fab>
+
+    <ion-list>
+
+        <ion-item *ngFor="let log of logs">
+            <ion-card (click)="logSelected($event, log)">
+                <img [src]="imageSanitized(log.did_it)"/>
+                <ion-card-content>
+                    <ion-card-title>
+                        {{log.position}} em {{log.unity}}
+                    </ion-card-title>
+                    <p class="muted">
+                        {{log.datetime | date:'EEE, dd/MM/y HH:mm'}}
+                    </p>
+                    <p>
+                        {{log.moment}}
+                    </p>
+                </ion-card-content>
+            </ion-card>
+        </ion-item>
+    </ion-list>
+</ion-content>
