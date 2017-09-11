@@ -1,25 +1,26 @@
-import { Component } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 
-import { NavController } from 'ionic-angular';
+import {NavController} from 'ionic-angular';
+import {File} from "@ionic-native/file";
+import {LogsService} from "../../app/services/logs.service";
+import {Log} from "../../app/models/Log";
 
 @Component({
-  selector: 'page-export',
-  templateUrl: 'export.html'
+    selector: 'page-export',
+    templateUrl: 'export.html',
+    providers: [File]
 })
-export class ExportPage {
-
-    dataObjectArray:Object[] = [
-        {
-            "id": 2,
-            nome: "fulano"
-        }
-    ];
+export class ExportPage implements OnInit{
+    dataObjectArray: Log[];
     dataColumnNames: string[] = [
-        "id", "nome"
+        "id", "data", "local","profissional", "momento", "higienizou", "insumo"
     ];
 
-  constructor(public navCtrl: NavController) {
+    constructor(public navCtrl: NavController, private logApi: LogsService) {
 
-  }
+    }
+
+    ngOnInit(): void {
+    }
 
 }

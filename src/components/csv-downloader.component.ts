@@ -1,8 +1,11 @@
 import {Component, Input, Output, EventEmitter, Renderer} from '@angular/core';
+import {File, FileWriter} from "@ionic-native/file";
+import {Platform} from "ionic-angular";
+import {LogsService} from "../app/services/logs.service";
 @Component({
     selector: 'csv-downloader',
     template: `
-        <button ion-button icon-left item-right large (click)="build()">
+        <button ion-button icon-left large (click)="build()">
             <ion-icon name='cloud-download'></ion-icon>
             {{downloaderName}}
         </button>
@@ -15,17 +18,20 @@ export class CsvDownloader {
     @Input() fileName: string = 'data.csv';
     @Output() onError = new EventEmitter<Error>();
 
-    constructor(private renderer: Renderer) {
+    constructor(private renderer: Renderer, private file: File, public plt: Platform, private logApi:LogsService) {
     }
 
     build() {
-        if (!this.data.length) {
-            this.onError.emit(new Error('Data not available.'));
-            return;
-        }
+        this.logApi.getLogs().subscribe(logs => {
+            this.data = logs;
+            if (!this.data.length) {
+                this.onError.emit(new Error('Data not available.'));
+                return;
+            }
+            let csvString = this.construct();
+            this.buildDownloader(csvString);
+        });
 
-        let csvString = this.construct();
-        this.buildDownloader(csvString);
     }
 
     private getDocumentBody(): any {
@@ -51,8 +57,15 @@ export class CsvDownloader {
 
         this.data.forEach(d => {
             keys.forEach(k => {
-                if (d.hasOwnProperty(k) && d[k] != null) {
-                    tabText += '"' + d[k] + '",';
+                let key = k;
+                //if (key == "_id") key = "_id.$oid";
+                if (d.hasOwnProperty(key) && d[key] != null) {
+                    if (key == '_id') 
+                    {
+                        tabText += '"' + d[key]['$oid'] + '",';
+                    }else {
+                        tabText += '"' + d[key] + '",';
+                    }
                 } else {
                     tabText += '"",';
                 }
@@ -66,16 +79,38 @@ export class CsvDownloader {
     }
 
     private buildDownloader(data) {
-        let anchor = this.renderer.createElement(this.getDocumentBody(), 'a');
-        this.renderer.setElementStyle(anchor, 'visibility', 'hidden');
-        this.renderer.setElementAttribute(anchor, 'href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(data));
-        this.renderer.setElementAttribute(anchor, 'target', '_blank');
-        this.renderer.setElementAttribute(anchor, 'download', this.fileName);
 
-        setTimeout(() => {
-            this.renderer.invokeElementMethod(anchor, 'click');
-            this.renderer.invokeElementMethod(anchor, 'remove');
-        }, 5);
+        if (this.plt.is('android'))
+        {
+            this.saveToFile(data);
 
+        } else {
+            let anchor = this.renderer.createElement(this.getDocumentBody(), 'a');
+            this.renderer.setElementStyle(anchor, 'visibility', 'hidden');
+            this.renderer.setElementAttribute(anchor, 'href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(data));
+            this.renderer.setElementAttribute(anchor, 'target', '_blank');
+            this.renderer.setElementAttribute(anchor, 'download', this.fileName);
+
+            setTimeout(() => {
+                this.renderer.invokeElementMethod(anchor, 'click');
+                this.renderer.invokeElementMethod(anchor, 'remove');
+            }, 5);
+        }
+
+    }
+
+    private saveToFile(data)
+    {
+        this.file.createFile('.', this.fileName, true ).then( fe=> {
+                fe.createWriter(function(fw){
+                    fw.write(data);
+                }),
+                    function (err) {
+                        console.log(err.toString());
+                    }
+
+            }
+
+        );
     }
 }
